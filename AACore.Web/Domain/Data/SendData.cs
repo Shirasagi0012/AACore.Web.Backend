@@ -2,7 +2,7 @@
 
 namespace AACore.Web.Domain.Data;
 
-public class SendData
+public struct SendData
 {
     public SwitchSet switch_set { get; }
     public bool switch_state { get; }

@@ -3,17 +3,19 @@ using System.IO.Ports;
 using System.Text;
 using System.Text.Json;
 using AACore.Web.Domain.Data;
+using AACore.Web.Utils;
 
-namespace AACore.Web.Domain.Serial;
+namespace AACore.Web.Domain;
 
 public class SerialConnection : IDisposable
 {
+
     private const long HeartbeatInterval = 500;
 
     private readonly SerialPort _serialPort;
     private readonly ILogger? _logger;
     private readonly CancellationTokenSource _cts;
-    private Thread _readThread;
+    private Task _readTask;
 
     public SerialConnection(SerialPort serialPort, Action<DeviceData> onReceiveData,
         ILogger? logger = null)
@@ -45,11 +47,10 @@ public class SerialConnection : IDisposable
 
         logger?.LogInformation("Staring read thread.");
         _cts = new CancellationTokenSource();
-        _readThread = new Thread(() => NewReadLoop(onReceiveData, _cts.Token));
-        _readThread.Start();
+        _readTask = NewReadLoop(onReceiveData,_cts.Token);
     }
 
-    private void NewReadLoop(Action<DeviceData> callback, CancellationToken ct)
+    private async Task NewReadLoop(Action<DeviceData> callback, CancellationToken ct)
     {
         var sw = new Stopwatch();
         var buffer = new StringBuilder();
@@ -78,6 +79,8 @@ public class SerialConnection : IDisposable
                             "JSON processing error: {Message}", ex.Message
                         );
                     }
+
+                    await Task.Delay(100, ct);
                 }
 
                 buffer.Append(next);
@@ -85,6 +88,10 @@ public class SerialConnection : IDisposable
             catch (TimeoutException)
             {
                 _logger?.LogWarning("Read Timeout. Check if device is online?");
+            }
+            catch (OperationCanceledException)
+            {
+                _logger?.LogInformation("Read Task Canceled.");
             }
             catch (Exception e)
             {
@@ -102,75 +109,16 @@ public class SerialConnection : IDisposable
         _serialPort.WriteLine(jsonData);
     }
 
-
-    // private void ReadLoop(Action<DeviceData> callback, CancellationToken ct)
-    // {
-    //     var buffer = new StringBuilder();
-    //
-    //     while (!ct.IsCancellationRequested)
-    //     {
-    //         try
-    //         {
-    //             var response = _serialPort.ReadLine();
-    //             _logger?.LogTrace($"Serial Received: {response}");
-    //
-    //             if (!string.IsNullOrEmpty(response))
-    //             {
-    //                 buffer.Append(response);
-    //
-    //                 while (true)
-    //                 {
-    //                     var bufferContent = buffer.ToString();
-    //
-    //                     var startIndex = bufferContent.IndexOf('{');
-    //                     var endIndex = bufferContent.IndexOf('}', startIndex);
-    //                     var endIndex2 = bufferContent.IndexOf('}', endIndex + 1);
-    //                     var endIndex3 = bufferContent.IndexOf('}', endIndex2 + 1);
-    //
-    //                     if (startIndex != -1 && endIndex3 != -1)
-    //                     {
-    //                         var jsonData = bufferContent.Substring(startIndex, endIndex3 - startIndex + 1);
-    //                         _logger?.LogError($"Received JSON: {jsonData}");
-    //                         try
-    //                         {
-    //                             var deviceData = JsonSerializer.Deserialize(jsonData,
-    //                                 AppJsonSerializerContext.Default.DeviceData);
-    //                             callback?.Invoke(deviceData);
-    //                         }
-    //                         catch (Exception ex)
-    //                         {
-    //                             _logger?.LogError(
-    //                                 "JSON processing error: {Message}", ex.Message
-    //                             );
-    //                         }
-    //
-    //                         buffer.Remove(0, endIndex3 + 1);
-    //                     }
-    //                     else
-    //                     {
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //
-    //             Thread.Sleep(100);
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             // Log the exception and dispose of the connection
-    //             _logger?.LogError("Exception when reading from serial port: {Message}", ex.Message);
-    //         }
-    //     }
-    // }
-
     # region IDisposable
 
     public void Dispose()
     {
         _logger?.LogInformation("Disposing Serial Connection.");
         _cts.Cancel();
+        ExceptionUtils.IgnoreException(() => _readTask.Wait());
         _serialPort.Dispose();
+        GC.SuppressFinalize(this);
     }
-
+    
     # endregion
 }

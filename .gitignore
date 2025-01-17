@@ -491,3 +491,5 @@ riderModule.iml
 /_ReSharper.Caches/
 /.vs
 /.idea/.idea.AACore.Web/.idea
+
+/AACore.Web/publish
