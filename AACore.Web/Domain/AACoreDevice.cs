@@ -1,8 +1,8 @@
 ﻿using System.IO.Ports;
-using AACore.Web.API;
+using AACore.Web.Domain.Configuration;
 using AACore.Web.Domain.Data;
 
-namespace AACore.Web.Domain.Serial;
+namespace AACore.Web.Domain;
 
 public class AACoreDevice(ILoggerProvider loggerProvider)
     : IDisposable
@@ -13,8 +13,7 @@ public class AACoreDevice(ILoggerProvider loggerProvider)
         set { _data = value; _connection.Send(_data); }
     }
 
-    private SwitchConfig[] switchConfigs = {};
-    private PwmConfig[] pwmConfigs = {};
+    public ProfileConfiguration ProfileConfiguration { get; } = new();
     
     private SerialConnection? _connection;
     private readonly ILogger _logger = loggerProvider.CreateLogger(nameof(AACoreDevice));

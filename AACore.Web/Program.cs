@@ -1,15 +1,15 @@
-using System.Text.Json.Serialization;
-using AACore.Web;
 using AACore.Web.API;
-using AACore.Web.Domain.Data;
-using AACore.Web.Domain.Device;
-using AACore.Web.Domain.Serial;
+using AACore.Web.Domain;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Scalar.AspNetCore;
+
+namespace AACore.Web;
 
 internal class Program
 {
     public static AACoreDevice Device { get; private set; }
+    
+    public static bool EnableLogging { get; set; } = true;
 
     public static void Main(string[] args)
     {
@@ -32,16 +32,14 @@ internal class Program
                                                 "Can't initialize ILoggerProvider service."));
 
         Device = device;
-
-
+        
         app.MapScalarApiReference("scalar"); // scalar/v1
         app.MapOpenApi();
 
-
         var prefix = app.MapGroup("/api/v1"); // ASCOM Alpaca API
 
-        prefix.MapSerialApi();
-        prefix.MapDeviceApi();
+        // prefix.MapSerialApi();
+        // prefix.MapDeviceApi();
 
         var prefix2 = app.MapGroup("/api/v1/aacore"); // AACore Web API
 

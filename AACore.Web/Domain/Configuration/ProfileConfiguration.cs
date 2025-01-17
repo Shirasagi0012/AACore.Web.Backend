@@ -1,10 +1,10 @@
-﻿using AACore.Web.Domain.Device;
+﻿using AACore.Web.Domain.Data;
 
-namespace AACore.Web.Domain.Serial.Configuration;
+namespace AACore.Web.Domain.Configuration;
 
 public record ProfileConfiguration
 {
-    internal Dictionary<ProfileItem, SwitchItem> Switches { get; } = new Dictionary<ProfileItem, SwitchItem>()
+    internal Dictionary<ProfileItem, SwitchItem> Profiles { get; } = new Dictionary<ProfileItem, SwitchItem>()
     {
         { ProfileItem.MainPower, new SwitchItem { Label = "整机功率(W)", Step = 0.0001 } },
         { ProfileItem.InputVoltage, new SwitchItem { Label = "输入电压(V)", Step = 0.0001 } },

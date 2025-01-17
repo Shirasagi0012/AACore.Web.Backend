@@ -1,4 +1,4 @@
-﻿namespace AACore.Web.Domain.Serial.Configuration;
+﻿namespace AACore.Web.Domain.Configuration;
 
 public record SerialConfiguration
 {

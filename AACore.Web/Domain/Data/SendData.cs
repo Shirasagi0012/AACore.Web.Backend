@@ -1,6 +1,4 @@
-﻿using AACore.Web.Domain.Device;
-
-namespace AACore.Web.Domain.Data;
+﻿namespace AACore.Web.Domain.Data;
 
 public struct SendData
 {

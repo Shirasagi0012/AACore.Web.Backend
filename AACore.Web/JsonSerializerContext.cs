@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using AACore.Web.API;
 using AACore.Web.Domain.Data;
-using AACore.Web.Domain.Device;
 
 namespace AACore.Web;
 
@@ -20,6 +19,7 @@ namespace AACore.Web;
 [JsonSerializable(typeof(SwitchConfig))]
 [JsonSerializable(typeof(PwmConfig))]
 [JsonSerializable(typeof(ConnectRequest))]
+[JsonSerializable(typeof(ConfigResponse))]
 [JsonSerializable(typeof(SwitchConfig[]))]
 [JsonSerializable(typeof(PwmConfig[]))]
 [JsonSerializable(typeof(((int, string)[], (int, string)[], bool)))]

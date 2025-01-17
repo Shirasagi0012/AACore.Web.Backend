@@ -1,4 +1,4 @@
-namespace AACore.Web.Domain.Device;
+namespace AACore.Web.Domain.Data;
 
 public struct GpsMsg
 {

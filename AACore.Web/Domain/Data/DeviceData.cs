@@ -1,6 +1,4 @@
-﻿using AACore.Web.Domain.Device;
-
-namespace AACore.Web.Domain.Data
+﻿namespace AACore.Web.Domain.Data
 {
     /// <summary>
     /// 设备回传的全部数据，并且提供了按id获取/设置数据的方法
