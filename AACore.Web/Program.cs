@@ -33,11 +33,10 @@ internal class Program
 
         Device = device;
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapScalarApiReference("scalar"); // scalar/v1
-            app.MapOpenApi();
-        }
+
+        app.MapScalarApiReference("scalar"); // scalar/v1
+        app.MapOpenApi();
+
 
         var prefix = app.MapGroup("/api/v1"); // ASCOM Alpaca API
 
